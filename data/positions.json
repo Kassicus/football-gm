@@ -1,0 +1,212 @@
+[
+    {
+        "code": "QB",
+        "name": "Quarterback",
+        "position_group": "offense",
+        "max_roster": 4,
+        "typical_roster": 3,
+        "key_attribute_1": "football_iq",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "leadership"
+    },
+    {
+        "code": "RB",
+        "name": "Running Back",
+        "position_group": "offense",
+        "max_roster": 6,
+        "typical_roster": 4,
+        "key_attribute_1": "speed",
+        "key_attribute_2": "agility",
+        "key_attribute_3": "strength"
+    },
+    {
+        "code": "FB",
+        "name": "Fullback",
+        "position_group": "offense",
+        "max_roster": 2,
+        "typical_roster": 1,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "blocking",
+        "key_attribute_3": "leadership"
+    },
+    {
+        "code": "WR",
+        "name": "Wide Receiver",
+        "position_group": "offense",
+        "max_roster": 8,
+        "typical_roster": 6,
+        "key_attribute_1": "speed",
+        "key_attribute_2": "agility",
+        "key_attribute_3": "skill_1"
+    },
+    {
+        "code": "TE",
+        "name": "Tight End",
+        "position_group": "offense",
+        "max_roster": 5,
+        "typical_roster": 3,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "blocking"
+    },
+    {
+        "code": "LT",
+        "name": "Left Tackle",
+        "position_group": "offense",
+        "max_roster": 3,
+        "typical_roster": 2,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "LG",
+        "name": "Left Guard",
+        "position_group": "offense",
+        "max_roster": 3,
+        "typical_roster": 2,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "C",
+        "name": "Center",
+        "position_group": "offense",
+        "max_roster": 3,
+        "typical_roster": 2,
+        "key_attribute_1": "football_iq",
+        "key_attribute_2": "leadership",
+        "key_attribute_3": "skill_1"
+    },
+    {
+        "code": "RG",
+        "name": "Right Guard",
+        "position_group": "offense",
+        "max_roster": 3,
+        "typical_roster": 2,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "RT",
+        "name": "Right Tackle",
+        "position_group": "offense",
+        "max_roster": 3,
+        "typical_roster": 2,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "DE",
+        "name": "Defensive End",
+        "position_group": "defense",
+        "max_roster": 6,
+        "typical_roster": 4,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "speed",
+        "key_attribute_3": "skill_1"
+    },
+    {
+        "code": "DT",
+        "name": "Defensive Tackle",
+        "position_group": "defense",
+        "max_roster": 5,
+        "typical_roster": 3,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "NT",
+        "name": "Nose Tackle",
+        "position_group": "defense",
+        "max_roster": 3,
+        "typical_roster": 2,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "skill_1",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "OLB",
+        "name": "Outside Linebacker",
+        "position_group": "defense",
+        "max_roster": 6,
+        "typical_roster": 4,
+        "key_attribute_1": "speed",
+        "key_attribute_2": "agility",
+        "key_attribute_3": "skill_1"
+    },
+    {
+        "code": "ILB",
+        "name": "Inside Linebacker",
+        "position_group": "defense",
+        "max_roster": 5,
+        "typical_roster": 3,
+        "key_attribute_1": "football_iq",
+        "key_attribute_2": "strength",
+        "key_attribute_3": "leadership"
+    },
+    {
+        "code": "CB",
+        "name": "Cornerback",
+        "position_group": "defense",
+        "max_roster": 7,
+        "typical_roster": 5,
+        "key_attribute_1": "speed",
+        "key_attribute_2": "agility",
+        "key_attribute_3": "skill_1"
+    },
+    {
+        "code": "SS",
+        "name": "Strong Safety",
+        "position_group": "defense",
+        "max_roster": 4,
+        "typical_roster": 2,
+        "key_attribute_1": "strength",
+        "key_attribute_2": "speed",
+        "key_attribute_3": "football_iq"
+    },
+    {
+        "code": "FS",
+        "name": "Free Safety",
+        "position_group": "defense",
+        "max_roster": 4,
+        "typical_roster": 2,
+        "key_attribute_1": "speed",
+        "key_attribute_2": "football_iq",
+        "key_attribute_3": "skill_1"
+    },
+    {
+        "code": "K",
+        "name": "Kicker",
+        "position_group": "special_teams",
+        "max_roster": 2,
+        "typical_roster": 1,
+        "key_attribute_1": "skill_1",
+        "key_attribute_2": "skill_2",
+        "key_attribute_3": "work_ethic"
+    },
+    {
+        "code": "P",
+        "name": "Punter",
+        "position_group": "special_teams",
+        "max_roster": 2,
+        "typical_roster": 1,
+        "key_attribute_1": "skill_1",
+        "key_attribute_2": "skill_2",
+        "key_attribute_3": "work_ethic"
+    },
+    {
+        "code": "LS",
+        "name": "Long Snapper",
+        "position_group": "special_teams",
+        "max_roster": 2,
+        "typical_roster": 1,
+        "key_attribute_1": "skill_1",
+        "key_attribute_2": "consistency",
+        "key_attribute_3": "work_ethic"
+    }
+]

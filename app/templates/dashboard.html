@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - NFL GM Simulator{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <h2>Team Dashboard</h2>
+    
+    <div class="team-selector">
+        <label for="team-select">Select Team:</label>
+        <select id="team-select">
+            <option value="">Loading teams...</option>
+        </select>
+    </div>
+    
+    <div class="dashboard-content">
+        <div class="dashboard-section">
+            <h3>Team Overview</h3>
+            <div id="team-overview">
+                <p>Select a team to view overview</p>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h3>Roster Summary</h3>
+            <div id="roster-summary">
+                <p>Select a team to view roster</p>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h3>Salary Cap</h3>
+            <div id="salary-cap">
+                <p>Select a team to view salary cap</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-page {
+    padding: 1rem;
+}
+
+.team-selector {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.team-selector label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.team-selector select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    min-width: 250px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.dashboard-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.dashboard-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
+
+.team-info {
+    display: grid;
+    gap: 1rem;
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.team-colors {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+}
+
+.team-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.team-detail {
+    display: flex;
+    justify-content: space-between;
+}
+
+.team-detail-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.team-detail-value {
+    color: var(--text-primary);
+}
+
+.roster-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.roster-stat {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.roster-stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.roster-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.cap-info {
+    display: grid;
+    gap: 1rem;
+}
+
+.cap-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.cap-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.cap-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.cap-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.error {
+    color: var(--error-color);
+    padding: 1rem;
+    background: rgba(244, 67, 54, 0.1);
+    border-radius: 4px;
+    border: 1px solid var(--error-color);
+}
+
+.debug-info {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+</style>
+
+<script>
+console.log('Dashboard script loaded');
+
+// Simple helper function to get DOM elements
+function getElement(id) {
+    const element = document.getElementById(id);
+    if (!element) {
+        console.error(`Element with ID '${id}' not found`);
+        return null;
+    }
+    return element;
+}
+
+// Simple helper function to set innerHTML
+function setInnerHTML(id, html) {
+    const element = getElement(id);
+    if (element) {
+        element.innerHTML = html;
+        return true;
+    }
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing dashboard');
+    initializeDashboard();
+});
+
+function initializeDashboard() {
+    console.log('Initializing dashboard...');
+    
+    // Verify all required elements exist
+    const requiredElements = ['team-select', 'team-overview', 'roster-summary', 'salary-cap'];
+    const missingElements = requiredElements.filter(id => !getElement(id));
+    
+    if (missingElements.length > 0) {
+        console.error('Missing required elements:', missingElements);
+        return;
+    }
+    
+    console.log('All required elements found, initializing...');
+    loadTeams();
+    
+    const teamSelect = getElement('team-select');
+    if (teamSelect) {
+        teamSelect.addEventListener('change', function() {
+            const teamId = this.value;
+            console.log('Team selected:', teamId);
+            if (teamId) {
+                loadTeamData(teamId);
+            }
+        });
+    }
+}
+
+function loadTeams() {
+    console.log('Loading teams...');
+    fetch('/api/teams')
+        .then(response => {
+            console.log('Teams response status:', response.status);
+            return response.json();
+        })
+        .then(teams => {
+            console.log('Teams loaded:', teams.length);
+            const select = getElement('team-select');
+            if (select) {
+                select.innerHTML = '<option value="">Select a team...</option>';
+                
+                teams.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team.id;
+                    option.textContent = `${team.city} ${team.name}`;
+                    select.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading teams:', error);
+            setInnerHTML('team-select', '<option value="">Error loading teams</option>');
+        });
+}
+
+function loadTeamData(teamId) {
+    console.log('Loading team data for ID:', teamId);
+    
+    // Load team overview
+    loadTeamOverview(teamId);
+    
+    // Load roster summary
+    loadRosterSummary(teamId);
+    
+    // Load salary cap
+    loadSalaryCap(teamId);
+}
+
+function loadTeamOverview(teamId) {
+    console.log('Loading team overview for ID:', teamId);
+    fetch(`/api/teams/${teamId}`)
+        .then(response => {
+            console.log('Team overview response status:', response.status);
+            return response.json();
+        })
+        .then(team => {
+            console.log('Team overview data:', team);
+            displayTeamOverview(team);
+        })
+        .catch(error => {
+            console.error('Error loading team overview:', error);
+            setInnerHTML('team-overview', `
+                <div class="error">Error loading team overview: ${error.message}</div>
+                <div class="debug-info">Team ID: ${teamId}</div>
+            `);
+        });
+}
+
+function displayTeamOverview(team) {
+    console.log('Displaying team overview:', team);
+    
+    // Handle different API response structures
+    const teamName = team.name || `${team.city} ${team.name}`;
+    const teamCity = team.city || '';
+    const conference = team.conference || 'N/A';
+    const division = team.division || 'N/A';
+    const abbreviation = team.abbreviation || 'N/A';
+    const foundedYear = team.founded_year || 'N/A';
+    const stadiumName = team.stadium || team.stadium_name || 'N/A';
+    const capacity = team.capacity || 'N/A';
+    
+    // Handle colors - check both possible structures
+    let primaryColor = '#000000';
+    let secondaryColor = '#FFFFFF';
+    
+    if (team.colors && team.colors.primary) {
+        primaryColor = team.colors.primary;
+        secondaryColor = team.colors.secondary || '#FFFFFF';
+    } else if (team.primary_color) {
+        primaryColor = team.primary_color;
+        secondaryColor = team.secondary_color || '#FFFFFF';
+    }
+    
+    let html = `
+        <div class="team-info">
+            <div class="team-header">
+                <div class="team-colors" style="background: linear-gradient(45deg, ${primaryColor} 50%, ${secondaryColor} 50%);"></div>
+                <div>
+                    <h4 style="margin: 0; color: var(--text-primary);">${teamCity} ${teamName}</h4>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">${conference} ${division}</p>
+                </div>
+            </div>
+            
+            <div class="team-details">
+                <div class="team-detail">
+                    <span class="team-detail-label">Abbreviation:</span>
+                    <span class="team-detail-value">${abbreviation}</span>
+                </div>
+                <div class="team-detail">
+                    <span class="team-detail-label">Founded:</span>
+                    <span class="team-detail-value">${foundedYear}</span>
+                </div>
+                <div class="team-detail">
+                    <span class="team-detail-label">Stadium:</span>
+                    <span class="team-detail-value">${stadiumName}</span>
+                </div>
+                <div class="team-detail">
+                    <span class="team-detail-label">Capacity:</span>
+                    <span class="team-detail-value">${capacity !== 'N/A' ? capacity.toLocaleString() : 'N/A'}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (!setInnerHTML('team-overview', html)) {
+        console.error('Failed to update team overview - element not found');
+    }
+}
+
+function loadRosterSummary(teamId) {
+    console.log('Loading roster summary for team ID:', teamId);
+    fetch(`/api/teams/${teamId}/roster`)
+        .then(response => {
+            console.log('Roster response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Roster data:', data);
+            displayRosterSummary(data);
+        })
+        .catch(error => {
+            console.error('Error loading roster:', error);
+            setInnerHTML('roster-summary', `
+                <div class="error">Error loading roster: ${error.message}</div>
+                <div class="debug-info">Team ID: ${teamId}</div>
+            `);
+        });
+}
+
+function displayRosterSummary(rosterData) {
+    console.log('Displaying roster summary:', rosterData);
+    
+    // Check if rosterData has the expected structure
+    if (!rosterData || typeof rosterData !== 'object') {
+        console.error('Invalid roster data received:', rosterData);
+        if (!setInnerHTML('roster-summary', `
+            <div class="error">Invalid roster data received</div>
+            <div class="debug-info">Received: ${typeof rosterData} - ${JSON.stringify(rosterData)}</div>
+        `)) {
+            console.error('Failed to update roster summary - element not found');
+        }
+        return;
+    }
+    
+    // Check if rosterData has an error
+    if (rosterData.error) {
+        if (!setInnerHTML('roster-summary', `<div class="error">${rosterData.error}</div>`)) {
+            console.error('Failed to update roster summary - element not found');
+        }
+        return;
+    }
+    
+    // Extract the actual roster array from the response
+    let players = [];
+    if (rosterData.roster && Array.isArray(rosterData.roster)) {
+        players = rosterData.roster;
+    } else if (Array.isArray(rosterData)) {
+        players = rosterData;
+    } else {
+        console.error('No valid roster array found in response:', rosterData);
+        if (!setInnerHTML('roster-summary', `
+            <div class="error">No roster data found</div>
+            <div class="debug-info">Response structure: ${JSON.stringify(rosterData)}</div>
+        `)) {
+            console.error('Failed to update roster summary - element not found');
+        }
+        return;
+    }
+    
+    console.log('Processing roster with', players.length, 'players');
+    
+    // Count players by position
+    const positionCounts = {};
+    players.forEach(player => {
+        const pos = player.position;
+        positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+    });
+    
+    let html = `
+        <div class="roster-stats">
+            <div class="roster-stat">
+                <div class="roster-stat-value">${players.length}</div>
+                <div class="roster-stat-label">Total Players</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <h4 style="margin: 0 0 1rem 0; color: var(--text-secondary);">Position Breakdown</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.5rem;">
+                ${Object.entries(positionCounts).map(([pos, count]) => `
+                    <div style="text-align: center; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">
+                        <div style="font-weight: bold; color: var(--accent-color);">${count}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${pos}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    if (!setInnerHTML('roster-summary', html)) {
+        console.error('Failed to update roster summary - element not found');
+    }
+}
+
+function loadSalaryCap(teamId) {
+    console.log('Loading salary cap for team ID:', teamId);
+    fetch(`/api/salary-cap/team/${teamId}`)
+        .then(response => {
+            console.log('Salary cap response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Salary cap data:', data);
+            displaySalaryCap(data);
+        })
+        .catch(error => {
+            console.error('Error loading salary cap:', error);
+            setInnerHTML('salary-cap', `
+                <div class="error">
+                    Error loading salary cap data: ${error.message}
+                </div>
+                <div class="debug-info">Team ID: ${teamId}</div>
+            `);
+        });
+}
+
+function displaySalaryCap(capData) {
+    console.log('Displaying salary cap:', capData);
+    
+    if (capData.error) {
+        if (!setInnerHTML('salary-cap', `<div class="error">${capData.error}</div>`)) {
+            console.error('Failed to update salary cap - element not found');
+        }
+        return;
+    }
+    
+    let html = `
+        <div class="cap-info">
+            <div class="cap-summary">
+                <div class="cap-item">
+                    <div class="cap-value">$${(capData.adjusted_cap / 1000000).toFixed(1)}M</div>
+                    <div class="cap-label">Adjusted Cap</div>
+                </div>
+                <div class="cap-item">
+                    <div class="cap-value">$${(capData.total_cap_used / 1000000).toFixed(1)}M</div>
+                    <div class="cap-label">Cap Used</div>
+                </div>
+                <div class="cap-item">
+                    <div class="cap-value">$${(capData.cap_space / 1000000).toFixed(1)}M</div>
+                    <div class="cap-label">Cap Space</div>
+                </div>
+                <div class="cap-item">
+                    <div class="cap-value">${capData.cap_percentage.toFixed(1)}%</div>
+                    <div class="cap-label">Used %</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (!setInnerHTML('salary-cap', html)) {
+        console.error('Failed to update salary cap - element not found');
+    }
+}
+</script>
+{% endblock %}

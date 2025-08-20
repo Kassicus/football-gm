@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}Roster Management - NFL GM Simulator{% endblock %}
+
+{% block content %}
+<div class="roster-page">
+    <h2>Roster Management</h2>
+    
+    <div class="roster-controls">
+        <div class="team-selector">
+            <label for="roster-team-select">Select Team:</label>
+            <select id="roster-team-select">
+                <option value="">Loading teams...</option>
+            </select>
+        </div>
+        
+        <div class="view-controls">
+            <button class="btn btn-primary" onclick="showDepthChart()">Depth Chart</button>
+            <button class="btn btn-secondary" onclick="showRosterList()">Roster List</button>
+            <button class="btn btn-secondary" onclick="showPositionGroups()">Position Groups</button>
+        </div>
+    </div>
+    
+    <div class="roster-content">
+        <!-- Depth Chart View -->
+        <div id="depth-chart-view" class="roster-view active">
+            <h3>Depth Chart</h3>
+            <div id="depth-chart-content">
+                <p>Select a team to view depth chart</p>
+            </div>
+        </div>
+        
+        <!-- Roster List View -->
+        <div id="roster-list-view" class="roster-view">
+            <h3>Roster List</h3>
+            <div id="roster-list-content">
+                <p>Select a team to view roster</p>
+            </div>
+        </div>
+        
+        <!-- Position Groups View -->
+        <div id="position-groups-view" class="roster-view">
+            <h3>Position Groups</h3>
+            <div id="position-groups-content">
+                <p>Select a team to view position groups</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.roster-page {
+    padding: 1rem;
+}
+
+.roster-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.team-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.team-selector label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.team-selector select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    min-width: 200px;
+}
+
+.view-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2c5aa0;
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.roster-view {
+    display: none;
+}
+
+.roster-view.active {
+    display: block;
+}
+
+.depth-chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.position-group {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--card-bg);
+}
+
+.position-group h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
+
+.player-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--bg-secondary);
+    transition: background-color 0.2s;
+}
+
+.player-row:hover {
+    background: var(--bg-secondary);
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.player-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.player-number {
+    background: var(--accent-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.player-rating {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.player-age {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.roster-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.roster-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    align-items: center;
+}
+
+.roster-header {
+    font-weight: bold;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.position-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.position-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--card-bg);
+}
+
+.position-card h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.position-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load teams into selector
+    loadTeams();
+    
+    // Set up team selection handler
+    document.getElementById('roster-team-select').addEventListener('change', function() {
+        const teamId = this.value;
+        if (teamId) {
+            loadTeamRoster(teamId);
+        }
+    });
+});
+
+function loadTeams() {
+    fetch('/api/teams')
+        .then(response => response.json())
+        .then(teams => {
+            const select = document.getElementById('roster-team-select');
+            select.innerHTML = '<option value="">Select a team...</option>';
+            
+            teams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.id;
+                option.textContent = `${team.city} ${team.name}`;
+                select.appendChild(option);
+            });
+        });
+}
+
+function loadTeamRoster(teamId) {
+    // Load depth chart
+    fetch(`/api/players/team/${teamId}/depth-chart`)
+        .then(response => response.json())
+        .then(depthChart => {
+            displayDepthChart(depthChart);
+        });
+    
+    // Load roster list
+    fetch(`/api/players?team_id=${teamId}&limit=100`)
+        .then(response => response.json())
+        .then(players => {
+            displayRosterList(players);
+        });
+    
+    // Load position groups
+    loadPositionGroups(teamId);
+}
+
+function displayDepthChart(depthChart) {
+    const content = document.getElementById('depth-chart-content');
+    
+    if (Object.keys(depthChart).length === 0) {
+        content.innerHTML = '<p>No players found for this team</p>';
+        return;
+    }
+    
+    let html = '<div class="depth-chart">';
+    
+    for (const [position, players] of Object.entries(depthChart)) {
+        html += `
+            <div class="position-group">
+                <h4>${position}</h4>
+                ${players.map((player, index) => `
+                    <div class="player-row">
+                        <div class="player-info">
+                            <span class="player-number">${player.jersey_number || '--'}</span>
+                            <span class="player-name">${player.name}</span>
+                        </div>
+                        <div class="player-rating">${player.overall_rating}</div>
+                        <div class="player-age">${player.age}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    content.innerHTML = html;
+}
+
+function displayRosterList(players) {
+    const content = document.getElementById('roster-list-content');
+    
+    if (players.length === 0) {
+        content.innerHTML = '<p>No players found for this team</p>';
+        return;
+    }
+    
+    let html = `
+        <div class="roster-header">
+            <div>Name</div>
+            <div>Position</div>
+            <div>Rating</div>
+            <div>Age</div>
+            <div>Years Pro</div>
+        </div>
+        <div class="roster-list">
+    `;
+    
+    players.forEach(player => {
+        html += `
+            <div class="roster-item">
+                <div class="player-name">${player.name}</div>
+                <div>${player.position}</div>
+                <div class="player-rating">${player.overall_rating}</div>
+                <div>${player.age}</div>
+                <div>${player.years_pro}</div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    content.innerHTML = html;
+}
+
+function loadPositionGroups(teamId) {
+    fetch(`/api/players?team_id=${teamId}&limit=100`)
+        .then(response => response.json())
+        .then(players => {
+            displayPositionGroups(players);
+        });
+}
+
+function displayPositionGroups(players) {
+    const content = document.getElementById('position-groups-content');
+    
+    if (players.length === 0) {
+        content.innerHTML = '<p>No players found for this team</p>';
+        return;
+    }
+    
+    // Group players by position
+    const positionGroups = {};
+    players.forEach(player => {
+        if (!positionGroups[player.position]) {
+            positionGroups[player.position] = [];
+        }
+        positionGroups[player.position].push(player);
+    });
+    
+    let html = '<div class="position-groups-grid">';
+    
+    for (const [position, positionPlayers] of Object.entries(positionGroups)) {
+        const avgRating = Math.round(positionPlayers.reduce((sum, p) => sum + p.overall_rating, 0) / positionPlayers.length);
+        const avgAge = Math.round(positionPlayers.reduce((sum, p) => sum + p.age, 0) / positionPlayers.length);
+        
+        html += `
+            <div class="position-card">
+                <h4>${position}</h4>
+                <div class="position-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${positionPlayers.length}</div>
+                        <div class="stat-label">Players</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${avgRating}</div>
+                        <div class="stat-label">Avg Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${avgAge}</div>
+                        <div class="stat-label">Avg Age</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${Math.max(...positionPlayers.map(p => p.overall_rating))}</div>
+                        <div class="stat-label">Top Rating</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    content.innerHTML = html;
+}
+
+function showDepthChart() {
+    showView('depth-chart-view');
+}
+
+function showRosterList() {
+    showView('roster-list-view');
+}
+
+function showPositionGroups() {
+    showView('position-groups-view');
+}
+
+function showView(viewId) {
+    // Hide all views
+    document.querySelectorAll('.roster-view').forEach(view => {
+        view.classList.remove('active');
+    });
+    
+    // Show selected view
+    document.getElementById(viewId).classList.add('active');
+    
+    // Update button states
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-secondary');
+    });
+    
+    // Highlight active button
+    event.target.classList.remove('btn-secondary');
+    event.target.classList.add('btn-primary');
+}
+</script>
+{% endblock %}

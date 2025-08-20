@@ -1,0 +1,549 @@
+{% extends "base.html" %}
+
+{% block title %}Player Detail - NFL GM Simulator{% endblock %}
+
+{% block content %}
+<div class="player-detail-page">
+    <div class="player-header">
+        <div class="player-basic-info">
+            <h2 id="player-name">Player Name</h2>
+            <div class="player-meta">
+                <span id="player-position">Position</span> • 
+                <span id="player-team">Team</span> • 
+                <span id="player-age">Age</span> years old
+            </div>
+        </div>
+        <div class="player-actions">
+            <button class="btn btn-primary" onclick="viewEvaluation()">View Evaluation</button>
+            <button class="btn btn-secondary" onclick="goBack()">Back to Roster</button>
+        </div>
+    </div>
+    
+    <div class="player-content">
+        <div class="player-stats-grid">
+            <!-- Overall Rating Card -->
+            <div class="stat-card overall-rating">
+                <h3>Overall Rating</h3>
+                <div class="rating-display">
+                    <span id="overall-rating-value" class="rating-number">--</span>
+                    <span id="overall-rating-grade" class="rating-grade">--</span>
+                </div>
+            </div>
+            
+            <!-- Potential Rating Card -->
+            <div class="stat-card potential-rating">
+                <h3>Potential</h3>
+                <div class="rating-display">
+                    <span id="potential-rating-value" class="rating-number">--</span>
+                </div>
+            </div>
+            
+            <!-- Development Trajectory Card -->
+            <div class="stat-card development">
+                <h3>Development</h3>
+                <div id="development-trajectory" class="trajectory-display">--</div>
+            </div>
+            
+            <!-- Injury Risk Card -->
+            <div class="stat-card injury-risk">
+                <h3>Injury Risk</h3>
+                <div id="injury-risk-level" class="risk-display">--</div>
+            </div>
+        </div>
+        
+        <!-- Attributes Grid -->
+        <div class="attributes-section">
+            <h3>Player Attributes</h3>
+            <div class="attributes-grid">
+                <div class="attribute-group">
+                    <h4>Physical Attributes</h4>
+                    <div class="attribute-bars">
+                        <div class="attribute-bar">
+                            <label>Speed</label>
+                            <div class="bar-container">
+                                <div id="speed-bar" class="bar-fill"></div>
+                                <span id="speed-value">--</span>
+                            </div>
+                        </div>
+                        <div class="attribute-bar">
+                            <label>Strength</label>
+                            <div class="bar-container">
+                                <div id="strength-bar" class="bar-fill"></div>
+                                <span id="strength-value">--</span>
+                            </div>
+                        </div>
+                        <div class="attribute-bar">
+                            <label>Agility</label>
+                            <div class="bar-container">
+                                <div id="agility-bar" class="bar-fill"></div>
+                                <span id="agility-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attribute-group">
+                    <h4>Mental Attributes</h4>
+                    <div class="attribute-bars">
+                        <div class="attribute-bar">
+                            <label>Football IQ</label>
+                            <div class="bar-container">
+                                <div id="football-iq-bar" class="bar-fill"></div>
+                                <span id="football-iq-value">--</span>
+                            </div>
+                        </div>
+                        <div class="attribute-bar">
+                            <label>Leadership</label>
+                            <div class="bar-container">
+                                <div id="leadership-bar" class="bar-fill"></div>
+                                <span id="leadership-value">--</span>
+                            </div>
+                        </div>
+                        <div class="attribute-bar">
+                            <label>Work Ethic</label>
+                            <div class="bar-container">
+                                <div id="work-ethic-bar" class="bar-fill"></div>
+                                <span id="work-ethic-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attribute-group">
+                    <h4>Position Skills</h4>
+                    <div class="attribute-bars">
+                        <div class="attribute-bar">
+                            <label id="skill-1-label">Skill 1</label>
+                            <div class="bar-container">
+                                <div id="skill-1-bar" class="bar-fill"></div>
+                                <span id="skill-1-value">--</span>
+                            </div>
+                        </div>
+                        <div class="attribute-bar">
+                            <label id="skill-2-label">Skill 2</label>
+                            <div class="bar-container">
+                                <div id="skill-2-bar" class="bar-fill"></div>
+                                <span id="skill-2-value">--</span>
+                            </div>
+                        </div>
+                        <div class="attribute-bar">
+                            <label id="skill-3-label">Skill 3</label>
+                            <div class="bar-container">
+                                <div id="skill-3-bar" class="bar-fill"></div>
+                                <span id="skill-3-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Evaluation Details -->
+        <div id="evaluation-details" class="evaluation-section" style="display: none;">
+            <h3>Detailed Evaluation</h3>
+            <div class="evaluation-grid">
+                <div class="evaluation-card">
+                    <h4>Trade Value</h4>
+                    <div id="trade-value-display">--</div>
+                </div>
+                <div class="evaluation-card">
+                    <h4>Position Comparison</h4>
+                    <div id="position-comparison-display">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.player-detail-page {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.player-basic-info h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.player-meta {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.player-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2c5aa0;
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.player-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.rating-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rating-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.rating-grade {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+.trajectory-display, .risk-display {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.attributes-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.attributes-section h3 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
+
+.attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.attribute-group h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.attribute-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.attribute-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attribute-bar label {
+    min-width: 100px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.bar-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.bar-fill {
+    height: 20px;
+    background: var(--accent-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    min-width: 0;
+}
+
+.attribute-bar span {
+    min-width: 30px;
+    text-align: right;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.evaluation-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.evaluation-section h3 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+}
+
+.evaluation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.evaluation-card {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.evaluation-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .player-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .player-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .attributes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+let currentPlayerId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get player ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    currentPlayerId = urlParams.get('id');
+    
+    if (currentPlayerId) {
+        loadPlayerDetails(currentPlayerId);
+    } else {
+        // Try to get from path
+        const pathParts = window.location.pathname.split('/');
+        const playerIndex = pathParts.indexOf('player');
+        if (playerIndex !== -1 && pathParts[playerIndex + 1]) {
+            currentPlayerId = pathParts[playerIndex + 1];
+            loadPlayerDetails(currentPlayerId);
+        }
+    }
+});
+
+function loadPlayerDetails(playerId) {
+    // Load basic player info
+    fetch(`/api/players/${playerId}`)
+        .then(response => response.json())
+        .then(player => {
+            displayPlayerInfo(player);
+        });
+    
+    // Load evaluation data
+    fetch(`/api/players/${playerId}/evaluation`)
+        .then(response => response.json())
+        .then(evaluation => {
+            displayPlayerEvaluation(evaluation);
+        });
+}
+
+function displayPlayerInfo(player) {
+    document.getElementById('player-name').textContent = `${player.first_name} ${player.last_name}`;
+    document.getElementById('player-position').textContent = player.position;
+    document.getElementById('player-team').textContent = player.team || 'Free Agent';
+    document.getElementById('player-age').textContent = player.age;
+    
+    // Display ratings
+    document.getElementById('overall-rating-value').textContent = player.ratings.overall;
+    document.getElementById('potential-rating-value').textContent = player.ratings.potential;
+    
+    // Display attributes
+    displayAttributeBar('speed', player.ratings.speed);
+    displayAttributeBar('strength', player.ratings.strength);
+    displayAttributeBar('agility', player.ratings.agility);
+    displayAttributeBar('football-iq', player.ratings.football_iq);
+    displayAttributeBar('leadership', player.ratings.leadership);
+    displayAttributeBar('work-ethic', player.ratings.work_ethic);
+    
+    // Display position-specific skills
+    displayAttributeBar('skill-1', player.ratings.skill_1 || 50);
+    displayAttributeBar('skill-2', player.ratings.skill_2 || 50);
+    displayAttributeBar('skill-3', player.ratings.skill_3 || 50);
+    
+    // Update skill labels based on position
+    updateSkillLabels(player.position);
+}
+
+function displayPlayerEvaluation(evaluation) {
+    // Display evaluation data
+    document.getElementById('development-trajectory').textContent = evaluation.evaluation.development_trajectory;
+    document.getElementById('injury-risk-level').textContent = evaluation.evaluation.injury_risk;
+    
+    // Store evaluation data for later use
+    window.currentEvaluation = evaluation;
+}
+
+function displayAttributeBar(attributeName, value) {
+    const bar = document.getElementById(`${attributeName}-bar`);
+    const valueSpan = document.getElementById(`${attributeName}-value`);
+    
+    if (bar && valueSpan) {
+        bar.style.width = `${value}%`;
+        valueSpan.textContent = value;
+        
+        // Color code based on value
+        if (value >= 80) {
+            bar.style.background = 'var(--success-color)';
+        } else if (value >= 70) {
+            bar.style.background = 'var(--accent-color)';
+        } else if (value >= 60) {
+            bar.style.background = 'var(--warning-color)';
+        } else {
+            bar.style.background = 'var(--error-color)';
+        }
+    }
+}
+
+function updateSkillLabels(position) {
+    const skillLabels = {
+        'QB': ['Accuracy', 'Arm Strength', 'Pocket Presence'],
+        'RB': ['Ball Security', 'Pass Blocking', 'Route Running'],
+        'WR': ['Catching', 'Route Running', 'Blocking'],
+        'TE': ['Catching', 'Blocking', 'Route Running'],
+        'LT': ['Pass Blocking', 'Run Blocking', 'Footwork'],
+        'LG': ['Pass Blocking', 'Run Blocking', 'Strength'],
+        'C': ['Snap Accuracy', 'Pass Blocking', 'Run Blocking'],
+        'RG': ['Pass Blocking', 'Run Blocking', 'Strength'],
+        'RT': ['Pass Blocking', 'Run Blocking', 'Footwork'],
+        'DE': ['Pass Rush', 'Run Defense', 'Tackling'],
+        'DT': ['Run Defense', 'Pass Rush', 'Tackling'],
+        'NT': ['Run Defense', 'Strength', 'Tackling'],
+        'OLB': ['Pass Rush', 'Coverage', 'Tackling'],
+        'ILB': ['Tackling', 'Coverage', 'Run Defense'],
+        'CB': ['Coverage', 'Tackling', 'Ball Skills'],
+        'SS': ['Tackling', 'Coverage', 'Run Defense'],
+        'FS': ['Coverage', 'Tackling', 'Ball Skills'],
+        'K': ['Field Goal Accuracy', 'Kickoff Distance', 'Clutch Performance'],
+        'P': ['Punt Distance', 'Hang Time', 'Directional Kicking'],
+        'LS': ['Snap Accuracy', 'Snap Speed', 'Coverage']
+    };
+    
+    const labels = skillLabels[position] || ['Skill 1', 'Skill 2', 'Skill 3'];
+    
+    document.getElementById('skill-1-label').textContent = labels[0];
+    document.getElementById('skill-2-label').textContent = labels[1];
+    document.getElementById('skill-3-label').textContent = labels[2];
+}
+
+function viewEvaluation() {
+    const evaluationSection = document.getElementById('evaluation-details');
+    if (evaluationSection.style.display === 'none') {
+        evaluationSection.style.display = 'block';
+        
+        if (window.currentEvaluation) {
+            displayDetailedEvaluation(window.currentEvaluation);
+        }
+    } else {
+        evaluationSection.style.display = 'none';
+    }
+}
+
+function displayDetailedEvaluation(evaluation) {
+    // Display trade value
+    const tradeValue = evaluation.trade_value;
+    document.getElementById('trade-value-display').innerHTML = `
+        <div><strong>Estimated Value:</strong> $${tradeValue.estimated_value.toLocaleString()}</div>
+        <div><strong>Age Multiplier:</strong> ${tradeValue.age_multiplier}x</div>
+        <div><strong>Position Multiplier:</strong> ${tradeValue.position_multiplier}x</div>
+    `;
+    
+    // Display position comparison
+    const comparison = evaluation.comparison;
+    if (comparison.total_players > 0) {
+        document.getElementById('position-comparison-display').innerHTML = `
+            <div><strong>Rank:</strong> ${comparison.rank} of ${comparison.total_players}</div>
+            <div><strong>Percentile:</strong> ${comparison.player_percentile}%</div>
+            <div><strong>Position Average:</strong> ${comparison.average_rating}</div>
+        `;
+    } else {
+        document.getElementById('position-comparison-display').textContent = 'No comparison data available';
+    }
+}
+
+function goBack() {
+    if (document.referrer) {
+        window.history.back();
+    } else {
+        window.location.href = '/roster';
+    }
+}
+</script>
+{% endblock %}
